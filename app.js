@@ -1,36 +1,21 @@
 //This is JSX syntax. It's parsed into JS by Babel (included in html src)
 // In essence, JSX writes "React.createElement(param1, param2, param3)".
 
-// const desc = 'I just learned how to create a React node and render it into the DOM.';
-// const myTitleID = 'main-title';
-// const name='Kento';
-// const header = (
-//     <header>
-//         <h1 id={myTitleID}>{name}'s First React Element!</h1>
-//         {/* Can write JS inside curly braces */}
-//         <p>{ desc }</p>
-//     </header>
-// );
-
-//React Component (Using a constructor)
-//Set property values inside App(), but pass the parameter in Header constructor.
-//It's like defining parameters in a function. You can "call" the component later to set the value for the props.
-
 const players = [
     {
         name: "Kento",
         score: 0,
-        id:1
+        id: 1
     },
     {
         name: "Ray",
         score: 69,
-        id:2
+        id: 2
     },
     {
         name: "Mark",
         score: 6969,
-        id:3
+        id: 3
     }
 ]
 
@@ -50,19 +35,52 @@ function Player(props) {
                 {props.playerName}
             </span>
 
-            <Counter playerScore={ props.playerScore } />
+            <Counter />
         </div>
     );
 }
 
-function Counter(props) {
-    return (
-        <div className="counter">
-            <button className="counter-action decrement"> - </button>
-            <span className="counter-score">{ props.playerScore }</span>
-            <button className="counter-action increment"> + </button>
-        </div>
-    );
+class Counter extends React.Component {
+
+    //Babel renders this code as a JS constructor.
+    state = {
+        playerScore: 0
+    };
+    //The above code is the same as writing the below code.
+    // constructor() {
+    //Calls the parent class's constructor.
+    //     super()
+    //     this.state = {
+    //         playerScore: 0
+    //     };
+    // }
+
+    //Arrow function is bound to the component of its instance
+    incrementScore = () => {
+        this.setState(prevState => ({
+            playerScore: prevState.playerScore + 1
+        }
+        ));
+    }
+
+    decrementScore = () => {
+        if (this.state.playerScore != 0) {
+            //setState takes a callback to make sure the state change happens synchronously.
+            this.setState(prevState => ({
+                playerScore: prevState.playerScore - 1
+            }));
+        }
+    }
+
+    render() {
+        return (
+            <div className="counter">
+                <button className="counter-action decrement" onClick={this.decrementScore}> - </button>
+                <span className="counter-score">{this.state.playerScore}</span>
+                <button className="counter-action increment" onClick={this.incrementScore}> + </button>
+            </div>
+        );
+    }
 }
 
 function App(props) {
@@ -72,16 +90,14 @@ function App(props) {
                 title="Scoreboard"
                 totalPlayers={players.length}
             />
-
             {/* Players list here */}
             {/* .map() is basically foreach in JS. */}
             {props.initialPlayers.map(
                 player =>
                     <Player
-                        playerName={ player.name }
-                        playerScore={ player.score }
+                        playerName={player.name}
                         // React needs a unique identifier to "React" quickly to changes in the DOM. Recommended to use strings.
-                        key={ player.id.toString() }
+                        key={player.id.toString()}
                     />
             )}
         </div>
