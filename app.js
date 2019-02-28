@@ -1,23 +1,6 @@
 //This is JSX syntax. It's parsed into JS by Babel (included in html src)
 // In essence, JSX writes "React.createElement(param1, param2, param3)".
 
-const players = [
-    {
-        name: "Kento",
-        score: 0,
-        id: 1
-    },
-    {
-        name: "Ray",
-        score: 69,
-        id: 2
-    },
-    {
-        name: "Mark",
-        score: 6969,
-        id: 3
-    }
-]
 
 function Header(props) {
     return (
@@ -32,10 +15,11 @@ function Player(props) {
     return (
         <div className="player">
             <span className="player-name">
-                {props.playerName}
+                <button className="remove-player" onClick={ () => props.removePlayer(props.id) }>X</button>
+                <strong>{props.playerName}</strong>
             </span>
-
             <Counter />
+            <br />
         </div>
     );
 }
@@ -83,31 +67,61 @@ class Counter extends React.Component {
     }
 }
 
-function App(props) {
-    return (
-        <div className="scoreboard">
-            <Header
-                title="Scoreboard"
-                totalPlayers={players.length}
-            />
-            {/* Players list here */}
-            {/* .map() is basically foreach in JS. */}
-            {props.initialPlayers.map(
-                player =>
-                    <Player
-                        playerName={player.name}
-                        // React needs a unique identifier to "React" quickly to changes in the DOM. Recommended to use strings.
-                        key={player.id.toString()}
-                    />
-            )}
-        </div>
-    );
+class App extends React.Component {
+
+    state = {
+        players: [
+            {
+                name: "Kento",
+                id: 1
+            },
+            {
+                name: "Ray",
+                id: 2
+            },
+            {
+                name: "Mark",
+                id: 3
+            }
+        ]
+    };
+
+    handleRemovePlayer = (id) => {
+        this.setState ( prevState => {
+            return {
+                players: prevState.players.filter( p => p.id !== id )
+            }
+        });
+    }
+
+    render() {
+        return (
+            <div className="scoreboard">
+                <Header
+                    title="Scoreboard"
+                    totalPlayers={this.state.players.length}
+                />
+                {/* Players list here */}
+                {/* .map() is basically foreach in JS. */}
+                {this.state.players.map(
+                    player =>
+                        <Player
+                            playerName={player.name}
+                            id={player.id}
+                            // React needs a unique identifier to "React" quickly to changes in the DOM. Recommended to use strings.
+                            key={player.id.toString()}
+                            removePlayer = {this.handleRemovePlayer}
+                        />
+                )}
+            </div>
+        );
+    }
 }
 
 //Renders DOM elements
 ReactDOM.render(
     //Custom template tags must begin with a capital letter.
-    <App initialPlayers={players} />,
+    <App />,
     document.getElementById('root')
 );
 
